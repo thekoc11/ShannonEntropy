@@ -1,6 +1,7 @@
 import math as mt
+import sys as sy
 
-f = open("text6.txt")
+f = open("files/allText.txt")
 contents = f.read()
 contents = contents.lower()
 contents = contents.translate({ord(i): None for i in ';,.\n\"\'`()/-1234567890:–’‘&á%'})
@@ -36,14 +37,18 @@ def dictByBlock(blockSize):
 
 
 def __main__():
+    print(sy.getsizeof('a'))
     unigram = dictByBlock(1)
     unigram_prob = {'': 0.0}
+    unigram_codeLength = {'': 0.0}
     entropy_Unigram = 0.0
     bigram = dictByBlock(2)
     bigram_prob = {'': 0.0}
+    bigram_codeLength = {'':0.0}
     entropy_bigram = 0.0
     trigram = dictByBlock(3)
     trigram_prob = {'': 0.0}
+    trigram_codeLength = {'':0.0}
     entropy_trigram = 0.0
     print(len(contents))
     for letter in contents:
@@ -62,13 +67,19 @@ def __main__():
 
     _sum = 0.0
     sumN = 0
+    unigram_codeLength.clear()
     for element in unigram_prob:
         _sum += unigram_prob[element]
         sumN += unigram[element]
         if unigram_prob[element] != 0.0:
             entropy_Unigram += unigram_prob[element] * mt.log2(1 / unigram_prob[element])
+            unigram_codeLength[element] = mt.ceil(mt.log2(1/unigram_prob[element]))
 
-    print(_sum, sumN, entropy_Unigram)
+    l_av = 0.0
+    for element in unigram_codeLength:
+        l_av += unigram_prob[element]*unigram_codeLength[element]
+    print(unigram_codeLength)
+    print(_sum, sumN, entropy_Unigram, l_av, l_av*len(contents)/8)
 
     for i in range(len(contents)):
         if i + 1 != len(contents):
@@ -88,11 +99,17 @@ def __main__():
         bigram_prob[element] = float(bigram[element] / sumN)
     print(bigram_prob)
     _sum = 0.0
+    bigram_codeLength.clear()
     for element in bigram_prob:
         _sum += bigram_prob[element]
         if bigram_prob[element] != 0.0:
             entropy_bigram += bigram_prob[element] * mt.log2(1 / bigram_prob[element])
-    print(_sum, entropy_bigram)
+            bigram_codeLength[element] = mt.ceil(mt.log2(1 / bigram_prob[element]))
+    print(bigram_codeLength)
+    l_av = 0.0
+    for element in bigram_codeLength:
+        l_av += bigram_prob[element] * bigram_codeLength[element]
+    print(_sum, entropy_bigram, l_av)
 
     for i in range(len(contents)):
         if i + 2 < len(contents):
